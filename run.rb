@@ -34,7 +34,7 @@ class MealOMatic
 		end
 	end
 	def listen_for_coins
-		#@credit = 86
+		@credit = 86
 		loop do
 			  r = serial_port.read(1)
 					@mutex.synchronize do
@@ -48,9 +48,13 @@ class MealOMatic
 		donates = @credit/@donate_rate
 		burger = [];
 		for i in 1..donates.floor
-			@credit -= @donate_rate
-			burger << "🍔"
-			api.donate(amount: (@donate_rate/100).to_s)
+			result = api.donate(amount:  (@donate_rate.to_f/100).to_s)
+			if !result
+			  puts 'Donation failed'
+			else
+				@credit -= @donate_rate
+				burger << "🍔"
+			end
 		end
 		spent = (burger.length*@donate_rate).to_f/100
 		if burger.length > 0
